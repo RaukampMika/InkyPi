@@ -17,7 +17,7 @@ class ImmichProvider:
         self.base_url = base_url
         self.key = key
         self.orientation = orientation
-        self.headers = {"x-api-key": self.key}
+        self.headers = {"x-api-key": self.key, "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"}
 
     def get_album_id(self, album: str) -> str:
         r = requests.get(f"{self.base_url}/api/albums", headers=self.headers)
@@ -29,6 +29,7 @@ class ImmichProvider:
     def get_asset_ids(self, album_id: str) -> list[str]:
         body = {
             "albumIds": [album_id],
+            "type": "IMAGE",
             "size": 1000,
             "page": 1
         }
@@ -85,7 +86,7 @@ class ImmichProvider:
             settings["prev_images"] = prev_images
 
         logger.info(f"Downloading image {asset_id}")
-        r = requests.get(f"{self.base_url}/api/assets/{asset_id}/original", headers=self.headers)
+        r = requests.get(f"{self.base_url}/api/assets/{asset_id}/thumbnail?size=preview", headers=self.headers)
         r.raise_for_status()
         return Image.open(BytesIO(r.content))
 
